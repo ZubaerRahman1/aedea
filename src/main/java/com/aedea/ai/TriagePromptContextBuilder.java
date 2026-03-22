@@ -3,15 +3,13 @@ package com.aedea.ai;
 import com.aedea.domain.TriageAssessment;
 import com.aedea.domain.enums.EvidenceType;
 import com.aedea.dto.DisputeTriageRequest;
-import com.aedea.guidance.MockGuidanceDocument;
 import java.util.List;
 
 public class TriagePromptContextBuilder {
 
     public TriagePromptContext build(
         DisputeTriageRequest request,
-        TriageAssessment assessment,
-        MockGuidanceDocument guidance
+        TriageAssessment assessment
     ) {
         TriagePromptContext context = new TriagePromptContext();
         context.setScheme(request.getScheme());

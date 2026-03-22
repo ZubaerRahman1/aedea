@@ -75,6 +75,19 @@ class DisputeTriageControllerTest {
             .andExpect(jsonPath("$.message").exists());
     }
 
+    @Test
+    void promptPreviewReturnsOkWithPromptField() throws Exception {
+        when(disputeTriageService.buildPromptPreview(any())).thenReturn("Prompt preview");
+
+        mockMvc.perform(post("/api/disputes/triage/prompt-preview")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson("VISA", "2025-01-10", "2025-01-12")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.prompt").exists());
+    }
+
     private String requestJson(String scheme, String transactionDate, String disputeDate) {
         String schemeLine = scheme == null ? "" : "  \"scheme\": \"" + scheme + "\",\n";
         return """

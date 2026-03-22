@@ -14,20 +14,15 @@ import com.aedea.guidance.MockGuidanceDocument;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 class TriagePromptContextBuilderTest {
 
     @Test
     void buildsContextFromRequestAndAssessment() {
-        DisputeTriageRequest request = new DisputeTriageRequest();
-        request.setScheme(CardScheme.VISA);
-        request.setReasonCode(DisputeReasonCode.GOODS_NOT_RECEIVED);
-        request.setAmount(new BigDecimal("10.00"));
-        request.setTransactionDate(LocalDate.of(2025, 1, 10));
-        request.setDisputeDate(LocalDate.of(2025, 1, 12));
-        request.setMerchantNarrative("Customer says item never arrived.");
-        request.setEvidenceProvided(List.of(EvidenceType.CUSTOMER_COMMUNICATION));
+        DisputeTriageRequest request = getDisputeTriageRequest();
 
         TriageAssessment assessment = new TriageAssessment();
         assessment.setMatchedGuidanceTitle("Goods Not Received - Delivery Evidence Checklist");
@@ -36,9 +31,7 @@ class TriagePromptContextBuilderTest {
         assessment.setRecommendedAction(RecommendedAction.GATHER_DELIVERY_EVIDENCE);
         assessment.setCaveatTypes(List.of(CaveatType.MISSING_MERCHANT_NARRATIVE));
 
-        MockGuidanceDocument guidance = new MockGuidanceDocument();
-
-        TriagePromptContext context = new TriagePromptContextBuilder().build(request, assessment, guidance);
+        TriagePromptContext context = new TriagePromptContextBuilder().build(request, assessment);
 
         assertNotNull(context);
         assertEquals(CardScheme.VISA, context.getScheme());
@@ -46,5 +39,17 @@ class TriagePromptContextBuilderTest {
         assertEquals(List.of(EvidenceType.CUSTOMER_COMMUNICATION), context.getEvidenceProvided());
         assertEquals("Goods Not Received - Delivery Evidence Checklist", context.getMatchedGuidanceTitle());
         assertEquals(RecommendedAction.GATHER_DELIVERY_EVIDENCE, context.getRecommendedAction());
+    }
+
+    private static @NonNull DisputeTriageRequest getDisputeTriageRequest() {
+        DisputeTriageRequest request = new DisputeTriageRequest();
+        request.setScheme(CardScheme.VISA);
+        request.setReasonCode(DisputeReasonCode.GOODS_NOT_RECEIVED);
+        request.setAmount(new BigDecimal("10.00"));
+        request.setTransactionDate(LocalDate.of(2025, 1, 10));
+        request.setDisputeDate(LocalDate.of(2025, 1, 12));
+        request.setMerchantNarrative("Customer says item never arrived.");
+        request.setEvidenceProvided(List.of(EvidenceType.CUSTOMER_COMMUNICATION));
+        return request;
     }
 }

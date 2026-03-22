@@ -2,6 +2,7 @@ package com.aedea.api;
 
 import com.aedea.dto.DisputeTriageRequest;
 import com.aedea.dto.DisputeTriageResponse;
+import com.aedea.dto.TriagePromptPreviewResponse;
 import com.aedea.service.DisputeTriageService;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
@@ -21,5 +22,12 @@ public class DisputeTriageController {
     @PostMapping("/api/disputes/triage")
     public DisputeTriageResponse triage(@Valid @RequestBody DisputeTriageRequest request) {
         return disputeTriageService.triage(request);
+    }
+
+    @PostMapping("/api/disputes/triage/prompt-preview")
+    public TriagePromptPreviewResponse promptPreview(@Valid @RequestBody DisputeTriageRequest request) {
+        TriagePromptPreviewResponse response = new TriagePromptPreviewResponse();
+        response.setPrompt(disputeTriageService.buildPromptPreview(request));
+        return response;
     }
 }

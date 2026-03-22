@@ -7,6 +7,9 @@ import com.aedea.domain.enums.guidance.RecommendedAction;
 import com.aedea.dto.DisputeTriageRequest;
 import com.aedea.dto.DisputeTriageResponse;
 import com.aedea.dto.TriageExplanationResponse;
+import com.aedea.ai.TriagePromptContext;
+import com.aedea.ai.TriagePromptContextBuilder;
+import com.aedea.ai.TriagePromptFormatter;
 import com.aedea.guidance.GuidanceRetriever;
 import com.aedea.guidance.MockGuidanceDocument;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DisputeTriageService {
     private final GuidanceRetriever guidanceRetriever;
+    private final TriagePromptContextBuilder promptContextBuilder = new TriagePromptContextBuilder();
+    private final TriagePromptFormatter promptFormatter = new TriagePromptFormatter();
 
     public DisputeTriageService(GuidanceRetriever guidanceRetriever) {
         this.guidanceRetriever = guidanceRetriever;
@@ -30,6 +35,18 @@ public class DisputeTriageService {
 
         TriageAssessment assessment = buildAssessment(request);
         return toResponse(assessment);
+    }
+
+    public String buildPromptPreview(DisputeTriageRequest request) {
+        if (request.getDisputeDate().isBefore(request.getTransactionDate())) {
+            throw new IllegalArgumentException("disputeDate must be on or after transactionDate");
+        }
+
+        MockGuidanceDocument guidance = guidanceRetriever.retrieve(request)
+            .orElseThrow(() -> new IllegalArgumentException("No guidance available for reason code"));
+        TriageAssessment assessment = buildAssessment(request);
+        TriagePromptContext context = promptContextBuilder.build(request, assessment);
+        return promptFormatter.format(context);
     }
 
     private TriageAssessment buildAssessment(DisputeTriageRequest request) {
