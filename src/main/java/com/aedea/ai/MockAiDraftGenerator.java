@@ -1,9 +1,7 @@
 package com.aedea.ai;
 
 import java.util.Objects;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MockAiDraftGenerator implements AiDraftGenerator {
     @Override
     public String generateDraft(String prompt) {

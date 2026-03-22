@@ -1,7 +1,7 @@
-package com.aedea.ai;
+package com.aedea.service;
 
+import com.aedea.ai.AiDraftGenerator;
 import com.aedea.dto.DisputeTriageRequest;
-import com.aedea.service.DisputeTriageService;
 import org.springframework.stereotype.Service;
 
 @Service

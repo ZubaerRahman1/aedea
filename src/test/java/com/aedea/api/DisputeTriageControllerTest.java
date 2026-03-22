@@ -13,7 +13,7 @@ import com.aedea.dto.DisputeTriageResponse;
 import com.aedea.dto.TriageAiDraftResponse;
 import com.aedea.dto.TriageExplanationResponse;
 import com.aedea.service.DisputeTriageService;
-import com.aedea.ai.TriageAiDraftService;
+import com.aedea.service.TriageAiDraftService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
