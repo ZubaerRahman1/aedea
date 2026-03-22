@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.aedea.domain.enums.guidance.RecommendedAction;
 import com.aedea.dto.DisputeTriageResponse;
+import com.aedea.dto.TriageExplanationResponse;
 import com.aedea.service.DisputeTriageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ class DisputeTriageControllerTest {
         DisputeTriageResponse response = new DisputeTriageResponse();
         response.setSummary("ok");
         response.setNextRecommendedAction(RecommendedAction.REVIEW_CASE_READINESS.getMessage());
+        response.setTriageExplanation(new TriageExplanationResponse());
+        response.setSupportingGuidanceNotes(java.util.List.of("Note 1"));
         when(disputeTriageService.triage(any())).thenReturn(response);
 
         mockMvc.perform(post("/api/disputes/triage")
@@ -42,7 +45,9 @@ class DisputeTriageControllerTest {
                 .content(requestJson("VISA", "2025-01-10", "2025-01-12")))
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.summary").exists());
+            .andExpect(jsonPath("$.summary").exists())
+            .andExpect(jsonPath("$.triageExplanation").exists())
+            .andExpect(jsonPath("$.supportingGuidanceNotes").isArray());
     }
 
     @Test

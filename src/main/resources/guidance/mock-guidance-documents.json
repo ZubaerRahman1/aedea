@@ -1,0 +1,102 @@
+[
+  {
+    "documentId": "GNR-001",
+    "title": "Goods Not Received - Delivery Evidence Checklist",
+    "reasonCode": "GOODS_NOT_RECEIVED",
+    "summaryType": "NON_RECEIPT_CLAIM",
+    "recommendedAction": "GATHER_DELIVERY_EVIDENCE",
+    "expectedEvidence": [
+      "PROOF_OF_DELIVERY",
+      "CUSTOMER_COMMUNICATION"
+    ],
+    "narrativeKeywords": [
+      "not received",
+      "missing delivery",
+      "never arrived"
+    ],
+    "operationalNotes": [
+      "Confirm delivery address matches order details.",
+      "Capture carrier tracking results and delivery confirmation."
+    ]
+  },
+  {
+    "documentId": "SNP-201",
+    "title": "Service Not Provided - Subscription Cancellation Dispute",
+    "reasonCode": "SERVICE_NOT_PROVIDED",
+    "summaryType": "SERVICE_FULFILLMENT_ISSUE",
+    "recommendedAction": "REVIEW_SERVICE_RECORDS",
+    "expectedEvidence": [
+      "CANCELLATION_POLICY",
+      "CUSTOMER_COMMUNICATION"
+    ],
+    "narrativeKeywords": [
+      "canceled subscription",
+      "still charged",
+      "cancelled plan"
+    ],
+    "operationalNotes": [
+      "Verify cancellation timestamp and policy terms.",
+      "Confirm whether billing stopped after cancellation."
+    ]
+  },
+  {
+    "documentId": "SNP-202",
+    "title": "Service Not Provided - Digital Access or Activation Issue",
+    "reasonCode": "SERVICE_NOT_PROVIDED",
+    "summaryType": "SERVICE_FULFILLMENT_ISSUE",
+    "recommendedAction": "REQUEST_MORE_INFORMATION",
+    "expectedEvidence": [
+      "SERVICE_LOG",
+      "CUSTOMER_COMMUNICATION"
+    ],
+    "narrativeKeywords": [
+      "cannot access",
+      "activation failed",
+      "login issue"
+    ],
+    "operationalNotes": [
+      "Check activation logs and access provisioning status.",
+      "Request screenshots or error messages if available."
+    ]
+  },
+  {
+    "documentId": "SNP-203",
+    "title": "Service Not Provided - Appointment Not Delivered",
+    "reasonCode": "SERVICE_NOT_PROVIDED",
+    "summaryType": "SERVICE_FULFILLMENT_ISSUE",
+    "recommendedAction": "REVIEW_SERVICE_RECORDS",
+    "expectedEvidence": [
+      "SERVICE_LOG",
+      "CUSTOMER_COMMUNICATION"
+    ],
+    "narrativeKeywords": [
+      "appointment missed",
+      "no show",
+      "technician never arrived"
+    ],
+    "operationalNotes": [
+      "Verify appointment scheduling and technician dispatch logs.",
+      "Capture any reschedule or cancellation records."
+    ]
+  },
+  {
+    "documentId": "DP-003",
+    "title": "Duplicate Processing - Charge Comparison",
+    "reasonCode": "DUPLICATE_PROCESSING",
+    "summaryType": "POSSIBLE_DUPLICATE_TRANSACTION",
+    "recommendedAction": "CHECK_FOR_DUPLICATE_CHARGE",
+    "expectedEvidence": [
+      "REFUND_RECORD",
+      "CUSTOMER_COMMUNICATION"
+    ],
+    "narrativeKeywords": [
+      "duplicate charge",
+      "charged twice",
+      "double billed"
+    ],
+    "operationalNotes": [
+      "Compare authorization and settlement timestamps.",
+      "Confirm whether a refund was issued for the duplicate."
+    ]
+  }
+]

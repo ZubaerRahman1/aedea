@@ -11,5 +11,7 @@ public class DisputeTriageResponse {
     private String summary;
     private List<EvidenceType> likelyMissingEvidence;
     private String nextRecommendedAction;
+    private TriageExplanationResponse triageExplanation;
+    private List<String> supportingGuidanceNotes;
     private List<CaveatType> caveats;
 }

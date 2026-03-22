@@ -1,12 +1,14 @@
 package com.aedea.service;
 
-import com.aedea.domain.MockDisputeGuidance;
+import com.aedea.domain.TriageAssessment;
 import com.aedea.domain.enums.CaveatType;
 import com.aedea.domain.enums.EvidenceType;
 import com.aedea.domain.enums.guidance.RecommendedAction;
 import com.aedea.dto.DisputeTriageRequest;
 import com.aedea.dto.DisputeTriageResponse;
-import com.aedea.guidance.MockGuidanceCatalog;
+import com.aedea.dto.TriageExplanationResponse;
+import com.aedea.guidance.GuidanceRetriever;
+import com.aedea.guidance.MockGuidanceDocument;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,19 +17,29 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DisputeTriageService {
-    private final MockGuidanceCatalog guidanceCatalog = new MockGuidanceCatalog();
+    private final GuidanceRetriever guidanceRetriever;
+
+    public DisputeTriageService(GuidanceRetriever guidanceRetriever) {
+        this.guidanceRetriever = guidanceRetriever;
+    }
 
     public DisputeTriageResponse triage(DisputeTriageRequest request) {
         if (request.getDisputeDate().isBefore(request.getTransactionDate())) {
             throw new IllegalArgumentException("disputeDate must be on or after transactionDate");
         }
 
-        MockDisputeGuidance guidance = guidanceCatalog.getGuidance(request.getReasonCode());
+        TriageAssessment assessment = buildAssessment(request);
+        return toResponse(assessment);
+    }
+
+    private TriageAssessment buildAssessment(DisputeTriageRequest request) {
+        MockGuidanceDocument guidance = guidanceRetriever.retrieve(request)
+            .orElseThrow(() -> new IllegalArgumentException("No guidance available for reason code"));
         List<EvidenceType> providedEvidence = request.getEvidenceProvided() == null
             ? Collections.emptyList()
             : request.getEvidenceProvided();
         List<EvidenceType> missingEvidence = new ArrayList<>();
-        for (EvidenceType evidenceType : guidance.getRecommendedEvidence()) {
+        for (EvidenceType evidenceType : guidance.getExpectedEvidence()) {
             if (!providedEvidence.contains(evidenceType)) {
                 missingEvidence.add(evidenceType);
             }
@@ -47,14 +59,45 @@ public class DisputeTriageService {
             }
         }
 
-        DisputeTriageResponse response = new DisputeTriageResponse();
-        response.setLikelyMissingEvidence(missingEvidence);
-        response.setCaveats(caveats);
-        response.setSummary(guidance.getGuidanceSummary().getMessage());
-        response.setNextRecommendedAction(missingEvidence.isEmpty()
-            ? RecommendedAction.REVIEW_CASE_READINESS.getMessage()
-            : guidance.getRecommendedAction().getMessage());
+        boolean hasMissingEvidence = !missingEvidence.isEmpty();
 
+        TriageAssessment assessment = new TriageAssessment();
+        assessment.setMatchedGuidanceTitle(guidance.getTitle());
+        assessment.setGuidanceMatched(true);
+        assessment.setGuidanceSource("mock-catalog");
+        assessment.setExpectedEvidence(guidance.getExpectedEvidence());
+        assessment.setSupportingGuidanceNotes(guidance.getOperationalNotes());
+        assessment.setSummaryType(guidance.getSummaryType());
+        assessment.setRecommendedAction(hasMissingEvidence
+            ? guidance.getRecommendedAction()
+            : RecommendedAction.REVIEW_CASE_READINESS);
+        assessment.setActionReason(hasMissingEvidence
+            ? "Dispute-type guidance action selected because expected evidence is missing."
+            : "Readiness review selected because all expected evidence is present.");
+        assessment.setMissingEvidence(missingEvidence);
+        assessment.setCaveatTypes(caveats);
+        assessment.setGuidanceDocumentId(guidance.getDocumentId());
+        return assessment;
+    }
+
+    private DisputeTriageResponse toResponse(TriageAssessment assessment) {
+        DisputeTriageResponse response = new DisputeTriageResponse();
+        response.setLikelyMissingEvidence(assessment.getMissingEvidence());
+        response.setCaveats(assessment.getCaveatTypes());
+        response.setSummary(assessment.getSummaryType().getMessage());
+        response.setNextRecommendedAction(assessment.getRecommendedAction().getMessage());
+        response.setTriageExplanation(toExplanationResponse(assessment));
+        response.setSupportingGuidanceNotes(assessment.getSupportingGuidanceNotes());
         return response;
     }
+
+    private TriageExplanationResponse toExplanationResponse(TriageAssessment assessment) {
+        TriageExplanationResponse explanation = new TriageExplanationResponse();
+        explanation.setGuidanceMatched(assessment.isGuidanceMatched());
+        explanation.setMatchedGuidanceTitle(assessment.getMatchedGuidanceTitle());
+        explanation.setGuidanceSource(assessment.getGuidanceSource());
+        explanation.setActionReason(assessment.getActionReason());
+        return explanation;
+    }
+
 }

@@ -1,18 +1,20 @@
-package com.aedea.domain;
+package com.aedea.guidance;
 
 import com.aedea.domain.enums.DisputeReasonCode;
 import com.aedea.domain.enums.EvidenceType;
-
-import java.util.List;
-
 import com.aedea.domain.enums.guidance.GuidanceSummaryType;
 import com.aedea.domain.enums.guidance.RecommendedAction;
+import java.util.List;
 import lombok.Data;
 
 @Data
-public class MockDisputeGuidance {
+public class MockGuidanceDocument {
+    private String documentId;
+    private String title;
     private DisputeReasonCode reasonCode;
-    private List<EvidenceType> recommendedEvidence;
+    private GuidanceSummaryType summaryType;
     private RecommendedAction recommendedAction;
-    private GuidanceSummaryType guidanceSummary;
+    private List<EvidenceType> expectedEvidence;
+    private List<String> operationalNotes;
+    private List<String> narrativeKeywords;
 }
