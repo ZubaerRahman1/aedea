@@ -2,7 +2,9 @@ package com.aedea.api;
 
 import com.aedea.dto.DisputeTriageRequest;
 import com.aedea.dto.DisputeTriageResponse;
+import com.aedea.dto.TriageAiDraftResponse;
 import com.aedea.dto.TriagePromptPreviewResponse;
+import com.aedea.ai.TriageAiDraftService;
 import com.aedea.service.DisputeTriageService;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
@@ -14,9 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class DisputeTriageController {
     private final DisputeTriageService disputeTriageService;
+    private final TriageAiDraftService triageAiDraftService;
 
-    public DisputeTriageController(DisputeTriageService disputeTriageService) {
+    public DisputeTriageController(
+        DisputeTriageService disputeTriageService,
+        TriageAiDraftService triageAiDraftService
+    ) {
         this.disputeTriageService = disputeTriageService;
+        this.triageAiDraftService = triageAiDraftService;
     }
 
     @PostMapping("/api/disputes/triage")
@@ -28,6 +35,13 @@ public class DisputeTriageController {
     public TriagePromptPreviewResponse promptPreview(@Valid @RequestBody DisputeTriageRequest request) {
         TriagePromptPreviewResponse response = new TriagePromptPreviewResponse();
         response.setPrompt(disputeTriageService.buildPromptPreview(request));
+        return response;
+    }
+
+    @PostMapping("/api/disputes/triage/ai-draft")
+    public TriageAiDraftResponse aiDraft(@Valid @RequestBody DisputeTriageRequest request) {
+        TriageAiDraftResponse response = new TriageAiDraftResponse();
+        response.setDraft(triageAiDraftService.generateDraft(request));
         return response;
     }
 }

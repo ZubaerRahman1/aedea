@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.aedea.domain.enums.guidance.RecommendedAction;
 import com.aedea.dto.DisputeTriageResponse;
+import com.aedea.dto.TriageAiDraftResponse;
 import com.aedea.dto.TriageExplanationResponse;
 import com.aedea.service.DisputeTriageService;
+import com.aedea.ai.TriageAiDraftService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -29,6 +31,9 @@ class DisputeTriageControllerTest {
 
     @MockitoBean
     private DisputeTriageService disputeTriageService;
+
+    @MockitoBean
+    private TriageAiDraftService triageAiDraftService;
 
     @Test
     void validRequestReturnsOk() throws Exception {
@@ -86,6 +91,30 @@ class DisputeTriageControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.prompt").exists());
+    }
+
+    @Test
+    void aiDraftReturnsOkWithDraftField() throws Exception {
+        when(triageAiDraftService.generateDraft(any())).thenReturn("Draft response preview");
+
+        mockMvc.perform(post("/api/disputes/triage/ai-draft")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson("VISA", "2025-01-10", "2025-01-12")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.draft").exists());
+    }
+
+    @Test
+    void aiDraftMissingRequiredFieldReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/disputes/triage/ai-draft")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson(null, "2025-01-10", "2025-01-12")))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message").exists());
     }
 
     private String requestJson(String scheme, String transactionDate, String disputeDate) {
